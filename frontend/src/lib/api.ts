@@ -88,3 +88,49 @@ export const createVersion = (promptId: number, content: string) =>
     method: "POST",
     body: JSON.stringify({ content }),
   });
+
+// ---------------------------------------------------------------------------
+// Datasets
+// ---------------------------------------------------------------------------
+
+export interface DatasetMeta {
+  id: number;
+  project_id: number;
+  name: string;
+  row_count: number;
+  created_at: string;
+}
+
+export interface DatasetDetail {
+  id: number;
+  project_id: number;
+  name: string;
+  rows: Array<{ input: string; expected_output: string }>;
+  created_at: string;
+}
+
+export const getDatasets = (projectId: number) =>
+  apiFetch<DatasetMeta[]>(`/projects/${projectId}/datasets`);
+
+export const getDatasetDetail = (datasetId: number) =>
+  apiFetch<DatasetDetail>(`/datasets/${datasetId}`);
+
+/** Upload a CSV file using multipart/form-data */
+export async function uploadDataset(
+  projectId: number,
+  file: File
+): Promise<DatasetMeta> {
+  const form = new FormData();
+  form.append("file", file);
+  const res = await fetch(`${BASE}/projects/${projectId}/datasets`, {
+    method: "POST",
+    body: form,
+    // Do NOT set Content-Type — browser sets it with the correct boundary
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({ detail: res.statusText }));
+    throw new Error(data.detail ?? `Upload failed (${res.status})`);
+  }
+  return res.json();
+}
+

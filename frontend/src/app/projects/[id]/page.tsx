@@ -30,6 +30,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { DatasetSection } from "@/components/DatasetSection";
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-US", {
@@ -312,6 +313,23 @@ export default function ProjectPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* ---- Datasets section ---- */}
+      <div className="mt-8">
+        <DatasetSection
+          projectId={projectId}
+          onDatasetSelected={(id) => {
+            // stored for Phase 3 evaluation run wiring
+            if (typeof window !== "undefined") {
+              if (id) {
+                localStorage.setItem(`project_${projectId}_dataset`, String(id));
+              } else {
+                localStorage.removeItem(`project_${projectId}_dataset`);
+              }
+            }
+          }}
+        />
+      </div>
     </div>
   );
 }

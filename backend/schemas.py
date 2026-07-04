@@ -58,3 +58,30 @@ class VersionRead(BaseModel):
     created_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+# ---------------------------------------------------------------------------
+# Dataset
+# ---------------------------------------------------------------------------
+
+class DatasetList(BaseModel):
+    """Lightweight response for listing datasets (no rows included)."""
+    id: int
+    project_id: int
+    name: str
+    row_count: int
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class DatasetDetail(BaseModel):
+    """Full dataset response including all parsed rows."""
+    id: int
+    project_id: int
+    name: str
+    rows: list[dict]
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+

@@ -11,8 +11,14 @@ Endpoints:
   PATCH /prompts/{id}
   POST /prompts/{id}/versions
   GET  /prompts/{id}/versions
+  POST /projects/{id}/datasets  (multipart CSV upload)
+  GET  /projects/{id}/datasets
+  GET  /datasets/{id}
 """
-from fastapi import FastAPI, Depends, HTTPException, status
+import io
+
+import pandas as pd
+from fastapi import FastAPI, Depends, File, HTTPException, UploadFile, status
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import func
 from sqlalchemy.orm import Session
@@ -224,3 +230,133 @@ def list_versions(prompt_id: int, db: Session = Depends(get_db)):
         .order_by(models.PromptVersion.version_number.desc())
         .all()
     )
+
+
+# ---------------------------------------------------------------------------
+# Datasets
+# ---------------------------------------------------------------------------
+
+REQUIRED_COLUMNS = {"input", "expected_output"}
+
+
+@app.post(
+    "/projects/{project_id}/datasets",
+    status_code=status.HTTP_201_CREATED,
+    response_model=schemas.DatasetList,
+    tags=["datasets"],
+)
+async def upload_dataset(
+    project_id: int,
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+):
+    """
+    Upload a CSV dataset for a project.
+    The CSV must have exactly the columns: input, expected_output (case-insensitive).
+    Returns 400 with a descriptive error if columns don't match.
+    """
+    project = db.get(models.Project, project_id)
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    if not file.filename or not file.filename.lower().endswith(".csv"):
+        raise HTTPException(status_code=400, detail="Only .csv files are accepted.")
+
+    raw = await file.read()
+    try:
+        df = pd.read_csv(io.BytesIO(raw))
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=f"Could not parse CSV: {exc}")
+
+    # Normalise column names: strip whitespace + lowercase
+    df.columns = [c.strip().lower() for c in df.columns]
+    found = set(df.columns.tolist())
+
+    if found != REQUIRED_COLUMNS:
+        missing = sorted(REQUIRED_COLUMNS - found)
+        extra = sorted(found - REQUIRED_COLUMNS)
+        parts = []
+        if missing:
+            parts.append(f"missing: {missing}")
+        if extra:
+            parts.append(f"unexpected: {extra}")
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f"CSV column mismatch. "
+                f"Expected exactly ['input', 'expected_output'], "
+                f"found {sorted(found)}. "
+                + "; ".join(parts)
+            ),
+        )
+
+    if df.empty:
+        raise HTTPException(status_code=400, detail="CSV has no data rows.")
+
+    rows = df[["input", "expected_output"]].dropna().to_dict(orient="records")
+
+    dataset = models.Dataset(
+        project_id=project_id,
+        name=file.filename,
+        rows_json=rows,
+    )
+    db.add(dataset)
+    db.commit()
+    db.refresh(dataset)
+
+    return schemas.DatasetList(
+        id=dataset.id,
+        project_id=dataset.project_id,
+        name=dataset.name,
+        row_count=len(rows),
+        created_at=dataset.created_at,
+    )
+
+
+@app.get(
+    "/projects/{project_id}/datasets",
+    response_model=list[schemas.DatasetList],
+    tags=["datasets"],
+)
+def list_datasets(project_id: int, db: Session = Depends(get_db)):
+    """List all datasets for a project (id, name, row count, created_at)."""
+    project = db.get(models.Project, project_id)
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    datasets = (
+        db.query(models.Dataset)
+        .filter(models.Dataset.project_id == project_id)
+        .order_by(models.Dataset.created_at.desc())
+        .all()
+    )
+    return [
+        schemas.DatasetList(
+            id=d.id,
+            project_id=d.project_id,
+            name=d.name,
+            row_count=len(d.rows_json or []),
+            created_at=d.created_at,
+        )
+        for d in datasets
+    ]
+
+
+@app.get(
+    "/datasets/{dataset_id}",
+    response_model=schemas.DatasetDetail,
+    tags=["datasets"],
+)
+def get_dataset(dataset_id: int, db: Session = Depends(get_db)):
+    """Return full dataset with all parsed rows (for preview)."""
+    dataset = db.get(models.Dataset, dataset_id)
+    if not dataset:
+        raise HTTPException(status_code=404, detail="Dataset not found")
+    return schemas.DatasetDetail(
+        id=dataset.id,
+        project_id=dataset.project_id,
+        name=dataset.name,
+        rows=dataset.rows_json or [],
+        created_at=dataset.created_at,
+    )
+
