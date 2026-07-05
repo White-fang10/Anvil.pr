@@ -1,6 +1,6 @@
 /**
  * lib/api.ts — Typed fetch wrappers for the Anvil.pr FastAPI backend.
- * Base URL points to the local dev server. Update for production.
+ * Base URL points to NEXT_PUBLIC_API_URL environment variable or falls back to Render.
  */
 
 const BASE = process.env.NEXT_PUBLIC_API_URL || "https://anvil-pr.onrender.com";
