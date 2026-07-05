@@ -85,3 +85,37 @@ class DatasetDetail(BaseModel):
 
     model_config = {"from_attributes": True}
 
+
+# ---------------------------------------------------------------------------
+# Evaluation
+# ---------------------------------------------------------------------------
+
+class EvaluationRequest(BaseModel):
+    version_id: int
+    dataset_id: int
+    models: list[str]
+
+
+class EvaluationRunRead(BaseModel):
+    id: int
+    version_id: int
+    dataset_id: int
+    model: str
+    results_json: list[dict]
+    avg_accuracy: float | None = None
+    avg_latency_ms: float | None = None
+    avg_cost_usd: float | None = None
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class PromptComparisonRow(BaseModel):
+    version_number: int
+    model: str
+    avg_accuracy: float | None = None
+    avg_latency_ms: float | None = None
+    avg_cost_usd: float | None = None
+    created_at: datetime
+
+    model_config = {"from_attributes": True}

@@ -5,7 +5,6 @@ import { Plus, FolderOpen, Calendar, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { getProjects, createProject, type Project } from "@/lib/api";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -28,7 +27,6 @@ export default function ProjectsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Dialog state
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newName, setNewName] = useState("");
   const [creating, setCreating] = useState(false);
@@ -64,16 +62,26 @@ export default function ProjectsPage() {
   };
 
   return (
-    <div>
+    <div className="space-y-8">
       {/* Page header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-end justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
-          <p className="text-muted-foreground mt-1">
-            Organise your prompts into projects.
+          <p className="text-xs tracking-[0.3em] text-white/30 uppercase font-medium mb-2">
+            Workspace
           </p>
+          <h1
+            className="text-4xl font-bold tracking-widest text-white/90 uppercase"
+            style={{ fontFamily: "var(--font-cinzel), serif" }}
+          >
+            Projects
+          </h1>
+          <div className="h-px w-16 bg-gradient-to-r from-white/30 to-transparent mt-3" />
         </div>
-        <Button id="new-project-btn" onClick={() => setDialogOpen(true)}>
+        <Button
+          id="new-project-btn"
+          onClick={() => setDialogOpen(true)}
+          className="gap-2"
+        >
           <Plus className="h-4 w-4" />
           New Project
         </Button>
@@ -81,43 +89,62 @@ export default function ProjectsPage() {
 
       {/* Content */}
       {loading ? (
-        <div className="flex items-center justify-center h-48 text-muted-foreground">
-          Loading…
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {[...Array(3)].map((_, i) => (
+            <div
+              key={i}
+              className="glass rounded-2xl h-28 animate-pulse"
+              style={{ animationDelay: `${i * 100}ms` }}
+            />
+          ))}
         </div>
       ) : error ? (
-        <div className="flex items-center justify-center h-48 text-destructive">
+        <div className="glass rounded-2xl flex items-center justify-center h-48 text-red-400 text-sm tracking-wide">
           {error}
         </div>
       ) : projects.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-64 gap-4 border border-dashed border-border rounded-xl text-center">
-          <FolderOpen className="h-12 w-12 text-muted-foreground/40" />
+        <div className="glass rounded-2xl flex flex-col items-center justify-center h-64 gap-5 text-center">
+          <div className="glass-elevated p-5 rounded-2xl">
+            <FolderOpen className="h-10 w-10 text-white/25" />
+          </div>
           <div>
-            <p className="font-medium text-muted-foreground">No projects yet</p>
-            <p className="text-sm text-muted-foreground/60 mt-1">
+            <p className="font-semibold text-white/60 tracking-widest text-sm uppercase">
+              No Projects Yet
+            </p>
+            <p className="text-xs text-white/25 mt-1.5 tracking-wide">
               Click &quot;New Project&quot; to get started.
             </p>
           </div>
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {projects.map((project) => (
+          {projects.map((project, idx) => (
             <Link key={project.id} href={`/projects/${project.id}`}>
-              <Card className="group cursor-pointer hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 transition-all duration-200">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
-                    <CardTitle className="text-base font-semibold leading-snug group-hover:text-primary transition-colors">
-                      {project.name}
-                    </CardTitle>
-                    <ArrowRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0 mt-0.5" />
+              <div
+                className="glass rounded-2xl p-6 cursor-pointer group relative overflow-hidden transition-all duration-300 hover:glass-elevated"
+                style={{ animationDelay: `${idx * 60}ms` }}
+              >
+                {/* Inner shine highlight */}
+                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+                {/* Hover glow */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl bg-gradient-to-br from-white/04 to-transparent pointer-events-none" />
+
+                <div className="flex items-start justify-between mb-5">
+                  <div className="glass p-2.5 rounded-xl">
+                    <FolderOpen className="h-4 w-4 text-white/50 group-hover:text-white/80 transition-colors" />
                   </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <Calendar className="h-3 w-3" />
-                    <span>{formatDate(project.created_at)}</span>
-                  </div>
-                </CardContent>
-              </Card>
+                  <ArrowRight className="h-4 w-4 text-white/20 group-hover:text-white/60 group-hover:translate-x-0.5 transition-all" />
+                </div>
+
+                <h3 className="font-semibold text-white/85 group-hover:text-white transition-colors tracking-wide mb-2 leading-snug">
+                  {project.name}
+                </h3>
+
+                <div className="flex items-center gap-1.5 text-xs text-white/25 tracking-wide">
+                  <Calendar className="h-3 w-3" />
+                  <span>{formatDate(project.created_at)}</span>
+                </div>
+              </div>
             </Link>
           ))}
         </div>
@@ -127,26 +154,37 @@ export default function ProjectsPage() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Create New Project</DialogTitle>
+            <DialogTitle>New Project</DialogTitle>
           </DialogHeader>
-          <div className="py-2">
-            <label htmlFor="project-name-input" className="text-sm font-medium mb-2 block text-muted-foreground">
-              Project name
+          <div className="py-3">
+            <label
+              htmlFor="project-name-input"
+              className="text-xs font-medium mb-2.5 block text-white/40 tracking-widest uppercase"
+            >
+              Project Name
             </label>
             <Input
               id="project-name-input"
-              placeholder="e.g. Customer Support Bot"
+              placeholder="e.g. Medical Chatbot, Support Agent..."
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleCreate()}
               autoFocus
             />
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDialogOpen(false)} disabled={creating}>
+          <DialogFooter className="gap-2">
+            <Button
+              variant="ghost"
+              onClick={() => setDialogOpen(false)}
+              disabled={creating}
+            >
               Cancel
             </Button>
-            <Button id="create-project-submit" onClick={handleCreate} disabled={creating || !newName.trim()}>
+            <Button
+              id="create-project-submit"
+              onClick={handleCreate}
+              disabled={creating || !newName.trim()}
+            >
               {creating ? "Creating…" : "Create Project"}
             </Button>
           </DialogFooter>

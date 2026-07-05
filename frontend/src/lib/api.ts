@@ -64,6 +64,9 @@ export const createProject = (name: string) =>
 export const getPrompts = (projectId: number) =>
   apiFetch<Prompt[]>(`/projects/${projectId}/prompts`);
 
+export const getPrompt = (promptId: number) =>
+  apiFetch<Prompt>(`/prompts/${promptId}`);
+
 export const createPrompt = (projectId: number, name: string) =>
   apiFetch<Prompt>(`/projects/${projectId}/prompts`, {
     method: "POST",
@@ -134,3 +137,54 @@ export async function uploadDataset(
   return res.json();
 }
 
+// ---------------------------------------------------------------------------
+// Evaluations
+// ---------------------------------------------------------------------------
+
+export interface EvaluationResult {
+  input: string;
+  expected_output: string;
+  model: string;
+  output: string;
+  latency_ms: number;
+  cost_usd: number;
+  error?: string | null;
+  semantic_score?: number | null;
+  judge_score?: number | null;
+  judge_reasoning?: string | null;
+  instruction_following_score?: number | null;
+  instruction_following_results?: Record<string, boolean> | null;
+}
+
+export interface EvaluationRun {
+  id: number;
+  version_id: number;
+  dataset_id: number;
+  model: string;
+  results_json: EvaluationResult[];
+  avg_accuracy: number | null;
+  avg_latency_ms: number | null;
+  avg_cost_usd: number | null;
+  created_at: string;
+}
+
+export const runEvaluation = (versionId: number, datasetId: number, models: string[]) =>
+  apiFetch<EvaluationRun[]>("/evaluate", {
+    method: "POST",
+    body: JSON.stringify({ version_id: versionId, dataset_id: datasetId, models }),
+  });
+
+export const getEvaluations = (versionId: number) =>
+  apiFetch<EvaluationRun[]>(`/evaluations/${versionId}`);
+
+export interface PromptComparisonRow {
+  version_number: number;
+  model: string;
+  avg_accuracy: number | null;
+  avg_latency_ms: number | null;
+  avg_cost_usd: number | null;
+  created_at: string;
+}
+
+export const getPromptComparison = (promptId: number) =>
+  apiFetch<PromptComparisonRow[]>(`/prompts/${promptId}/comparison`);

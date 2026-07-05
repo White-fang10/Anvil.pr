@@ -1,16 +1,19 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Space_Grotesk, Cinzel } from "next/font/google";
 import Link from "next/link";
+import Image from "next/image";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const cinzel = Cinzel({
+  variable: "--font-cinzel",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -26,47 +29,67 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${spaceGrotesk.variable} ${cinzel.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-background text-foreground">
-        {/* Top navigation bar */}
-        <header className="sticky top-0 z-40 border-b border-border bg-card/80 backdrop-blur-sm">
-          <div className="mx-auto max-w-7xl flex h-14 items-center px-6 gap-6">
+      <body className="min-h-full flex flex-col bg-background text-foreground relative">
+        {/* Background logo texture */}
+        <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden flex items-center justify-center opacity-[0.02]">
+          <Image
+            src="/logo.png"
+            alt=""
+            width={800}
+            height={800}
+            className="object-contain transform -rotate-12 scale-150 blur-[2px]"
+            priority
+          />
+        </div>
+
+        {/* Top navigation bar — glass nav */}
+        <header className="glass-nav sticky top-0 z-40">
+          <div className="mx-auto max-w-7xl flex h-16 items-center px-6 gap-6">
             <Link
               href="/projects"
-              className="flex items-center gap-2 font-semibold text-foreground hover:text-primary transition-colors"
+              className="flex items-center gap-3 group"
             >
-              {/* Anvil icon */}
-              <svg
-                width="22"
-                height="22"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="text-primary"
+              <div className="relative w-8 h-8 flex items-center justify-center logo-float logo-glow rounded-md">
+                <Image
+                  src="/logo.png"
+                  alt="Anvil.pr logo"
+                  width={32}
+                  height={32}
+                  className="object-contain rounded-md transition-opacity duration-300"
+                  priority
+                />
+              </div>
+              <span
+                className="font-display text-base tracking-widest text-white/80 group-hover:text-white transition-colors duration-200 uppercase"
+                style={{ fontFamily: "var(--font-cinzel), serif", letterSpacing: "0.15em" }}
               >
-                <path d="M2 17h20v4H2z" />
-                <path d="M16 8V4H8v4" />
-                <path d="M4 17V9a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v8" />
-              </svg>
-              <span>Anvil.pr</span>
+                Anvil<span className="text-white/40">.pr</span>
+              </span>
             </Link>
-            <nav className="flex items-center gap-1 text-sm text-muted-foreground">
+
+            <div className="h-5 w-px bg-white/10" />
+
+            <nav className="flex items-center gap-1 text-sm">
               <Link
                 href="/projects"
-                className="px-3 py-1.5 rounded-md hover:bg-accent hover:text-foreground transition-colors"
+                className="px-4 py-1.5 rounded-full text-white/50 hover:text-white/90 hover:bg-white/06 transition-all duration-200 tracking-wide text-xs uppercase font-medium"
               >
                 Projects
               </Link>
             </nav>
+
+            {/* Right decorative element */}
+            <div className="ml-auto flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-emerald-500/60 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.5)]" />
+              <span className="text-xs text-white/30 tracking-widest uppercase font-medium">Live</span>
+            </div>
           </div>
         </header>
 
         {/* Page content */}
-        <main className="flex-1 mx-auto w-full max-w-7xl px-6 py-8">
+        <main className="flex-1 mx-auto w-full max-w-7xl px-6 py-10 animate-page-in">
           {children}
         </main>
       </body>

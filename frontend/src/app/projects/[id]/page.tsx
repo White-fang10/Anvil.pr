@@ -193,24 +193,30 @@ export default function ProjectPage() {
   return (
     <div>
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
-        <Link href="/projects" className="flex items-center gap-1 hover:text-foreground transition-colors">
-          <ChevronLeft className="h-4 w-4" />
+      <div className="flex items-center gap-2 text-xs text-white/30 tracking-widest uppercase font-medium mb-6">
+        <Link href="/projects" className="hover:text-white/60 transition-colors">
           Projects
         </Link>
-        <span>/</span>
-        <span className="text-foreground font-medium">{project.name}</span>
+        <span className="text-white/15">/</span>
+        <span className="text-white/60">{project.name}</span>
       </div>
 
       {/* Page header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-end justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">{project.name}</h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="text-xs tracking-[0.3em] text-white/30 uppercase font-medium mb-2">Prompt Library</p>
+          <h1
+            className="text-3xl font-bold tracking-widest text-white/90 uppercase"
+            style={{ fontFamily: "var(--font-cinzel), serif" }}
+          >
+            {project.name}
+          </h1>
+          <div className="h-px w-16 bg-gradient-to-r from-white/30 to-transparent mt-3" />
+          <p className="text-xs text-white/30 mt-2 tracking-wide">
             {prompts.length} prompt{prompts.length !== 1 ? "s" : ""}
           </p>
         </div>
-        <Button id="new-prompt-btn" onClick={() => setDialogOpen(true)}>
+        <Button id="new-prompt-btn" onClick={() => setDialogOpen(true)} className="gap-2">
           <Plus className="h-4 w-4" />
           New Prompt
         </Button>
@@ -218,42 +224,42 @@ export default function ProjectPage() {
 
       {/* Prompts list */}
       {prompts.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-64 gap-4 border border-dashed border-border rounded-xl text-center">
-          <FileText className="h-12 w-12 text-muted-foreground/40" />
+        <div className="glass rounded-2xl flex flex-col items-center justify-center h-64 gap-5 text-center">
+          <div className="glass-elevated p-5 rounded-2xl">
+            <FileText className="h-10 w-10 text-white/25" />
+          </div>
           <div>
-            <p className="font-medium text-muted-foreground">No prompts yet</p>
-            <p className="text-sm text-muted-foreground/60 mt-1">
+            <p className="font-semibold text-white/60 tracking-widest text-sm uppercase">No Prompts Yet</p>
+            <p className="text-xs text-white/25 mt-1.5 tracking-wide">
               Click &quot;New Prompt&quot; to add your first prompt.
             </p>
           </div>
         </div>
       ) : (
-        <Card>
-          <CardHeader className="pb-0">
-            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-              Prompts
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-4">
+        <div className="glass rounded-2xl overflow-hidden">
+          <div className="px-6 py-4 border-b border-white/06">
+            <p className="text-xs font-semibold text-white/30 uppercase tracking-widest">Prompts</p>
+          </div>
+          <div className="px-2 py-2">
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Created</TableHead>
-                  <TableHead className="w-24 text-right">Action</TableHead>
+                <TableRow className="border-white/06 hover:bg-transparent">
+                  <TableHead className="text-white/30 text-xs uppercase tracking-widest font-medium">Name</TableHead>
+                  <TableHead className="text-white/30 text-xs uppercase tracking-widest font-medium">Created</TableHead>
+                  <TableHead className="w-24 text-right text-white/30 text-xs uppercase tracking-widest font-medium">Action</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {prompts.map((prompt) => (
-                  <TableRow key={prompt.id} className="group">
-                    <TableCell className="font-medium">
+                  <TableRow key={prompt.id} className="group border-white/05 hover:bg-white/03">
+                    <TableCell className="font-medium text-white/75">
                       <InlineEdit
                         value={prompt.name}
                         promptId={prompt.id}
                         onSaved={handlePromptRenamed}
                       />
                     </TableCell>
-                    <TableCell className="text-muted-foreground text-sm">
+                    <TableCell className="text-white/30 text-sm tracking-wide">
                       {formatDate(prompt.created_at)}
                     </TableCell>
                     <TableCell className="text-right">
@@ -270,7 +276,7 @@ export default function ProjectPage() {
                           id={`open-prompt-${prompt.id}`}
                           variant="ghost"
                           size="sm"
-                          className="opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="opacity-0 group-hover:opacity-100 transition-opacity text-white/60"
                         >
                           Open
                         </Button>
@@ -280,19 +286,19 @@ export default function ProjectPage() {
                 ))}
               </TableBody>
             </Table>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
 
       {/* New Prompt Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Create New Prompt</DialogTitle>
+            <DialogTitle>New Prompt</DialogTitle>
           </DialogHeader>
-          <div className="py-2">
-            <label htmlFor="prompt-name-input" className="text-sm font-medium mb-2 block text-muted-foreground">
-              Prompt name
+          <div className="py-3">
+            <label htmlFor="prompt-name-input" className="text-xs font-medium mb-2.5 block text-white/40 tracking-widest uppercase">
+              Prompt Name
             </label>
             <Input
               id="prompt-name-input"

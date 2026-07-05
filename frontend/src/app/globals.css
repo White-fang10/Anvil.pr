@@ -1,42 +1,51 @@
+@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap");
 @import "tailwindcss";
 
 /* -----------------------------------------------------------------------
-   shadcn/ui CSS variable tokens — dark mode first (Anvil.pr is dark-first)
+   GLASSMORPHIC DARK THEME — Anvil.pr
    ----------------------------------------------------------------------- */
 :root {
-  --background: 222 47% 11%;
-  --foreground: 210 40% 98%;
+  /* True deep black base */
+  --background: 0 0% 4%;
+  --foreground: 0 0% 92%;
 
-  --card: 222 47% 14%;
-  --card-foreground: 210 40% 98%;
+  /* Glass card — near-black with slight translucency */
+  --card: 0 0% 8%;
+  --card-foreground: 0 0% 92%;
 
-  --popover: 222 47% 11%;
-  --popover-foreground: 210 40% 98%;
+  --popover: 0 0% 6%;
+  --popover-foreground: 0 0% 92%;
 
-  --primary: 217 91% 60%;
-  --primary-foreground: 222 47% 11%;
+  /* Silver-tinted primary */
+  --primary: 210 15% 70%;
+  --primary-foreground: 0 0% 6%;
 
-  --secondary: 217 33% 20%;
-  --secondary-foreground: 210 40% 98%;
+  --secondary: 0 0% 12%;
+  --secondary-foreground: 0 0% 80%;
 
-  --muted: 217 33% 18%;
-  --muted-foreground: 215 20% 55%;
+  --muted: 0 0% 10%;
+  --muted-foreground: 0 0% 45%;
 
-  --accent: 217 33% 22%;
-  --accent-foreground: 210 40% 98%;
+  --accent: 0 0% 14%;
+  --accent-foreground: 0 0% 90%;
 
-  --destructive: 0 84% 60%;
-  --destructive-foreground: 210 40% 98%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 98%;
 
-  --border: 217 33% 22%;
-  --input: 217 33% 22%;
-  --ring: 217 91% 60%;
+  /* Chrome/silver border */
+  --border: 0 0% 20%;
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-highlight: rgba(255, 255, 255, 0.12);
+  --glass-shine: rgba(255, 255, 255, 0.04);
 
-  --radius: 0.5rem;
+  --input: 0 0% 14%;
+  --ring: 210 15% 60%;
+
+  --radius: 0.875rem;
 }
 
 /* -----------------------------------------------------------------------
-   Map CSS variables into Tailwind v4 theme
+   Tailwind v4 theme mapping
    ----------------------------------------------------------------------- */
 @theme inline {
   --color-background: hsl(var(--background));
@@ -59,13 +68,14 @@
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
 
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: "Space Grotesk", "Inter", system-ui, sans-serif;
+  --font-display: "Cinzel", serif;
+  --font-mono: "JetBrains Mono", monospace;
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --radius-xl: calc(var(--radius) + 6px);
 }
 
 /* -----------------------------------------------------------------------
@@ -74,37 +84,184 @@
 *,
 *::before,
 *::after {
-  border-color: hsl(var(--border));
+  border-color: var(--glass-border);
+}
+
+html {
+  color-scheme: dark;
 }
 
 body {
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Subtle radial vignette */
+  background-image: 
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255,255,255,0.03) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(180,180,220,0.03) 0%, transparent 60%);
 }
 
-/* Subtle scrollbar */
+/* -----------------------------------------------------------------------
+   Glass utility classes
+   ----------------------------------------------------------------------- */
+
+/* Standard glass panel */
+.glass {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0.02) 50%,
+    rgba(0, 0, 0, 0.2) 100%
+  );
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.10),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Elevated glass — for cards on focus/hover */
+.glass-elevated {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.09) 0%,
+    rgba(255, 255, 255, 0.03) 50%,
+    rgba(0, 0, 0, 0.25) 100%
+  );
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  box-shadow:
+    0 8px 40px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+/* Chrome/metallic border glow */
+.glass-chrome {
+  border: 1px solid transparent;
+  background-clip: padding-box;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.10),
+    0 8px 32px rgba(0,0,0,0.6),
+    inset 0 1px 0 rgba(255,255,255,0.12);
+}
+
+/* Navbar glass */
+.glass-nav {
+  background: rgba(8, 8, 8, 0.75);
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.04), 0 4px 24px rgba(0,0,0,0.5);
+}
+
+/* Input glass */
+.glass-input {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  transition: border-color 200ms, box-shadow 200ms;
+}
+.glass-input:focus {
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.05), inset 0 1px 0 rgba(255,255,255,0.06);
+  outline: none;
+}
+
+/* Button glass variants */
+.btn-glass {
+  background: linear-gradient(135deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.12),
+    inset 0 -1px 0 rgba(0,0,0,0.2),
+    0 4px 12px rgba(0,0,0,0.4);
+  transition: all 200ms ease;
+}
+.btn-glass:hover {
+  background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.07) 100%);
+  border-color: rgba(255,255,255,0.20);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.18),
+    inset 0 -1px 0 rgba(0,0,0,0.2),
+    0 6px 20px rgba(0,0,0,0.5);
+  transform: translateY(-1px);
+}
+.btn-glass:active {
+  transform: translateY(0);
+}
+
+/* Silver/chrome accent button */
+.btn-chrome {
+  background: linear-gradient(135deg, rgba(200,200,220,0.18) 0%, rgba(140,140,160,0.08) 50%, rgba(80,80,100,0.15) 100%);
+  border: 1px solid rgba(255,255,255,0.20);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.25),
+    inset 0 -1px 0 rgba(0,0,0,0.30),
+    0 4px 16px rgba(0,0,0,0.5);
+  color: rgba(255,255,255,0.90);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  transition: all 200ms ease;
+}
+.btn-chrome:hover {
+  background: linear-gradient(135deg, rgba(220,220,240,0.25) 0%, rgba(160,160,180,0.12) 50%, rgba(100,100,120,0.20) 100%);
+  border-color: rgba(255,255,255,0.30);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.35),
+    inset 0 -1px 0 rgba(0,0,0,0.30),
+    0 6px 24px rgba(0,0,0,0.6);
+  transform: translateY(-1px);
+}
+
+/* Display font utility */
+.font-display {
+  font-family: "Cinzel", serif;
+  letter-spacing: 0.08em;
+}
+
+/* Shine highlight line at top of glass elements */
+.glass-shine::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+  border-radius: 100%;
+}
+
+/* -----------------------------------------------------------------------
+   Scrollbar
+   ----------------------------------------------------------------------- */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: hsl(var(--border));
+  background: rgba(255,255,255,0.10);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--muted-foreground));
+  background: rgba(255,255,255,0.18);
 }
 
-/* Keyframes for dialog animations */
+/* -----------------------------------------------------------------------
+   Animations
+   ----------------------------------------------------------------------- */
 @keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 @keyframes fade-out {
   from { opacity: 1; }
@@ -119,17 +276,57 @@ body {
   to { opacity: 0; transform: translate(-50%, -50%) scale(0.95); }
 }
 
+/* Logo — gentle float */
+@keyframes logo-float {
+  0%, 100% { transform: translateY(0px);   }
+  50%       { transform: translateY(-4px);  }
+}
+
+/* Logo — breathing glow ring */
+@keyframes logo-glow {
+  0%, 100% {
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.10),
+      0 0 12px rgba(255,255,255,0.06),
+      0 0 0px rgba(255,255,255,0.00);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.22),
+      0 0 24px rgba(255,255,255,0.14),
+      0 0 48px rgba(200,210,255,0.08);
+  }
+}
+
+/* Page content stagger */
+@keyframes slide-up-fade {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 .data-\[state\=open\]\:animate-in[data-state=open] {
-  animation: fade-in 150ms ease-out;
+  animation: fade-in 180ms ease-out;
 }
 .data-\[state\=closed\]\:animate-out[data-state=closed] {
-  animation: fade-out 100ms ease-in;
+  animation: fade-out 120ms ease-in;
 }
 .data-\[state\=open\]\:zoom-in-95[data-state=open],
 .data-\[state\=open\]\:fade-in-0[data-state=open] {
-  animation: zoom-in-95 150ms ease-out;
+  animation: zoom-in-95 180ms ease-out;
 }
 .data-\[state\=closed\]\:zoom-out-95[data-state=closed],
 .data-\[state\=closed\]\:fade-out-0[data-state=closed] {
-  animation: zoom-out-95 100ms ease-in;
+  animation: zoom-out-95 120ms ease-in;
 }
+
+/* Animation utility classes */
+.animate-page-in {
+  animation: slide-up-fade 400ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.logo-float {
+  animation: logo-float 4s ease-in-out infinite;
+}
+.logo-glow {
+  animation: logo-glow 3.5s ease-in-out infinite;
+}
+
