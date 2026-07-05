@@ -3,7 +3,7 @@
  * Base URL points to NEXT_PUBLIC_API_URL environment variable or falls back to Render.
  */
 
-const BASE = process.env.NEXT_PUBLIC_API_URL || "https://anvil-pr.onrender.com";
+const BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
