@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Space_Grotesk, Cinzel } from "next/font/google";
 import Link from "next/link";
 import Image from "next/image";
+import ApiSettings from "@/components/ApiSettings";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -81,9 +82,8 @@ export default function RootLayout({
             </nav>
 
             {/* Right decorative element */}
-            <div className="ml-auto flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-emerald-500/60 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.5)]" />
-              <span className="text-xs text-white/30 tracking-widest uppercase font-medium">Live</span>
+            <div className="ml-auto">
+              <ApiSettings />
             </div>
           </div>
         </header>

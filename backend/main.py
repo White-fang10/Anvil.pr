@@ -391,10 +391,22 @@ PRICE_TABLE = {
 }
 
 print("Loading sentence-transformers model...")
-similarity_model = SentenceTransformer("all-MiniLM-L6-v2")
+try:
+    # Try loading from local cache first (works offline)
+    similarity_model = SentenceTransformer("all-MiniLM-L6-v2", local_files_only=True)
+    print("Loaded model from local cache.")
+except Exception:
+    try:
+        # If not cached, try downloading (requires internet)
+        print("Local cache not found, downloading model...")
+        similarity_model = SentenceTransformer("all-MiniLM-L6-v2")
+        print("Model downloaded successfully.")
+    except Exception as e:
+        print(f"WARNING: Could not load sentence-transformers model: {e}")
+        similarity_model = None
 
 def compute_similarity(expected: str, actual: str) -> float:
-    if not expected or not actual:
+    if not expected or not actual or similarity_model is None:
         return 0.0
     emb1 = similarity_model.encode(expected, convert_to_tensor=True)
     emb2 = similarity_model.encode(actual, convert_to_tensor=True)

@@ -3,10 +3,27 @@
  * Base URL points to NEXT_PUBLIC_API_URL environment variable or falls back to Render.
  */
 
-const BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+export function getBaseUrl(): string {
+  if (typeof window !== "undefined") {
+    const override = localStorage.getItem("ANVIL_API_URL");
+    if (override) return override;
+  }
+  return process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+}
+
+export function setBaseUrl(url: string) {
+  if (typeof window !== "undefined") {
+    if (!url) {
+      localStorage.removeItem("ANVIL_API_URL");
+    } else {
+      localStorage.setItem("ANVIL_API_URL", url);
+    }
+  }
+}
 
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, {
+  const base = getBaseUrl();
+  const res = await fetch(`${base}${path}`, {
     headers: { "Content-Type": "application/json", ...init?.headers },
     ...init,
   });
@@ -125,7 +142,8 @@ export async function uploadDataset(
 ): Promise<DatasetMeta> {
   const form = new FormData();
   form.append("file", file);
-  const res = await fetch(`${BASE}/projects/${projectId}/datasets`, {
+  const base = getBaseUrl();
+  const res = await fetch(`${base}/projects/${projectId}/datasets`, {
     method: "POST",
     body: form,
     // Do NOT set Content-Type — browser sets it with the correct boundary
