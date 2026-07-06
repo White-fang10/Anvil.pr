@@ -24,7 +24,11 @@ export function setBaseUrl(url: string) {
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const base = getBaseUrl();
   const res = await fetch(`${base}${path}`, {
-    headers: { "Content-Type": "application/json", ...init?.headers },
+    headers: { 
+      "Content-Type": "application/json", 
+      "ngrok-skip-browser-warning": "69420",
+      ...init?.headers 
+    },
     ...init,
   });
   if (!res.ok) {
@@ -146,6 +150,9 @@ export async function uploadDataset(
   const res = await fetch(`${base}/projects/${projectId}/datasets`, {
     method: "POST",
     body: form,
+    headers: {
+      "ngrok-skip-browser-warning": "69420"
+    }
     // Do NOT set Content-Type — browser sets it with the correct boundary
   });
   if (!res.ok) {
